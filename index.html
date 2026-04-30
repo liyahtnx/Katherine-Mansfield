@@ -166,9 +166,44 @@
     overflow: hidden;
   }
 
+  /* ── BOTTOM NAV ── */
+  #bottom-nav {
+    background: var(--surface);
+    border-top: 2px solid var(--border);
+    padding: 7px 20px;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    flex-shrink: 0;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+  }
+  #bottom-nav::-webkit-scrollbar { height: 3px; }
+  #bottom-nav::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+  .nav-label {
+    font-size: 10px; font-weight: 700; color: var(--text-muted);
+    text-transform: uppercase; letter-spacing: .6px;
+    margin-right: 4px; white-space: nowrap; flex-shrink: 0;
+  }
+  .nav-sep { width: 1px; height: 20px; background: var(--border); margin: 0 4px; flex-shrink: 0; }
+  .q-dot {
+    width: 26px; height: 26px;
+    border-radius: 5px;
+    border: 1.5px solid var(--unanswered);
+    background: var(--surface2);
+    color: var(--text-muted);
+    font-size: 11px; font-weight: 600;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer;
+    transition: all .12s;
+    flex-shrink: 0;
+  }
+  .q-dot:hover { border-color: var(--accent); color: var(--accent); background: var(--accent-light); }
+  .q-dot.done { background: var(--accent); border-color: var(--accent); color: #fff; }
+
   /* ── PASSAGE PANEL ── */
   #passage-panel {
-    width: 50%;
+    flex: 1;
     border-right: 2px solid var(--border);
     display: flex;
     flex-direction: column;
@@ -322,11 +357,71 @@
     font-size: 14px;
     font-weight: 700;
     text-align: center;
-    margin-bottom: 18px;
+    margin-bottom: 14px;
     padding: 10px;
     background: var(--surface2);
     border-radius: 8px;
     border: 1px solid var(--border);
+  }
+
+  .notes-list {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .note-item {
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+    font-size: 13.5px;
+    line-height: 1.6;
+    padding: 9px 14px;
+    border-radius: 8px;
+  }
+
+  .note-item.gap-item {
+    background: var(--surface);
+    border: 1.5px solid var(--border);
+    transition: border-color .15s, background .15s;
+  }
+  .note-item.gap-item.answered { border-color: var(--accent); background: var(--accent-light); }
+
+  .note-item.context-note {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--accent);
+    color: #3a3530;
+    font-weight: 500;
+  }
+
+  .bullet {
+    color: var(--accent);
+    font-size: 16px;
+    font-weight: 700;
+    flex-shrink: 0;
+    line-height: 1;
+    margin-top: 1px;
+  }
+
+  .q-num-inline {
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--accent);
+    margin-right: 2px;
+  }
+
+  .context-note {
+    font-size: 13px;
+    color: #4a4540;
+    font-weight: 500;
+    line-height: 1.55;
+    padding: 9px 16px;
+    margin: 0;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--accent);
+    border-radius: 6px;
   }
   .gap-item {
     background: var(--surface);
@@ -396,42 +491,14 @@
   .submit-btn:active { transform: scale(.97); }
   .submit-btn:disabled { background: var(--unanswered); cursor: not-allowed; }
 
-  /* ── BOTTOM NAV ── */
-  #bottom-nav {
-    background: var(--surface);
-    border-top: 2px solid var(--border);
-    padding: 10px 24px;
+  /* ── QUESTIONS PANEL ── */
+  #questions-panel {
+    width: 50%;
     display: flex;
-    align-items: center;
-    gap: 6px;
-    flex-shrink: 0;
-    flex-wrap: wrap;
+    flex-direction: column;
+    overflow: hidden;
+    background: var(--bg);
   }
-  .nav-label {
-    font-size: 11px;
-    font-weight: 600;
-    color: var(--text-muted);
-    text-transform: uppercase;
-    letter-spacing: .7px;
-    margin-right: 4px;
-  }
-  .q-dot {
-    width: 30px; height: 30px;
-    border-radius: 6px;
-    border: 1.5px solid var(--unanswered);
-    background: var(--surface2);
-    color: var(--text-muted);
-    font-size: 12px;
-    font-weight: 600;
-    display: flex; align-items: center; justify-content: center;
-    cursor: pointer;
-    transition: all .12s;
-  }
-  .q-dot:hover { border-color: var(--accent); color: var(--accent); background: var(--accent-light); }
-  .q-dot.done { background: var(--accent); border-color: var(--accent); color: #fff; }
-  .q-dot.current { border-color: var(--accent); color: var(--accent); background: var(--accent-light); box-shadow: 0 0 0 2px var(--accent-light); }
-
-  /* ── RESULTS ── */
   #results-overlay {
     position: fixed; inset: 0;
     background: var(--bg);
@@ -751,50 +818,79 @@
 
         <div class="gap-section-title">Katherine Mansfield's adult years</div>
 
-        <div class="gap-item" id="qblock-7">
-          <span class="q-num">7</span>
-          <span class="gap-text">— <input class="gap-input" id="gap-7" placeholder="year…" oninput="onGapInput(7)"> — moved from England back to New Zealand</span>
-        </div>
+        <div class="notes-list">
 
-        <div class="gap-item" id="qblock-8">
-          <span class="q-num">8</span>
-          <span class="gap-text">— first paid writing work was in a publication based in <input class="gap-input" id="gap-8" placeholder="country…" oninput="onGapInput(8)"></span>
-        </div>
+          <div class="note-item gap-item" id="qblock-7">
+            <span class="bullet">•</span>
+            <span class="gap-text"><span class="q-num-inline">7.</span> <input class="gap-input" id="gap-7" oninput="onGapInput(7)"> — moved from England back to New Zealand</span>
+          </div>
 
-        <div class="gap-item" id="qblock-9">
-          <span class="q-num">9</span>
-          <span class="gap-text">— her <input class="gap-input" id="gap-9" placeholder="word…" oninput="onGapInput(9)"> and the New Zealand way of life made her feel dissatisfied</span>
-        </div>
+          <div class="note-item gap-item" id="qblock-8">
+            <span class="bullet">•</span>
+            <span class="gap-text">first paid writing work was in a publication based in <span class="q-num-inline">8.</span> <input class="gap-input" id="gap-8" oninput="onGapInput(8)"></span>
+          </div>
 
-        <div style="padding-left:16px; margin: 8px 0 8px; font-size:13px; color:var(--text-muted); font-weight:500">1908: returned to London &nbsp; · &nbsp; 1911–1919:</div>
-        <div style="padding-left:16px; margin-bottom: 8px; font-size:13px; color:var(--text-muted)">— Met John Middleton Murry in 1911</div>
+          <div class="note-item gap-item" id="qblock-9">
+            <span class="bullet">•</span>
+            <span class="gap-text">her <span class="q-num-inline">9.</span> <input class="gap-input" id="gap-9" oninput="onGapInput(9)"> and the New Zealand way of life made her feel dissatisfied</span>
+          </div>
 
-        <div class="gap-item" id="qblock-10">
-          <span class="q-num">10</span>
-          <span class="gap-text">— <input class="gap-input" id="gap-10" placeholder="word…" oninput="onGapInput(10)"> prevented Mansfield and Murry from staying together in Paris</span>
-        </div>
+          <div class="note-item context-note">
+            <span class="bullet">•</span>
+            <span>1908: returned to London</span>
+          </div>
 
-        <div class="gap-item" id="qblock-11">
-          <span class="q-num">11</span>
-          <span class="gap-text">— spent time with distinguished <input class="gap-input" id="gap-11" placeholder="word…" oninput="onGapInput(11)"></span>
-        </div>
+          <div class="note-item context-note">
+            <span class="bullet">•</span>
+            <span>1911–1919:</span>
+          </div>
 
-        <div style="padding-left:16px; margin: 8px 0 8px; font-size:13px; color:var(--text-muted)">— from 1916, tuberculosis restricted the time she spent in London</div>
-        <div style="padding-left:16px; margin-bottom:8px; font-size:13px; color:var(--text-muted); font-weight:500">1920:</div>
+          <div class="note-item context-note" style="padding-left:48px">
+            <span class="bullet">•</span>
+            <span>Met John Middleton Murry in 1911</span>
+          </div>
 
-        <div class="gap-item" id="qblock-12">
-          <span class="q-num">12</span>
-          <span class="gap-text">— her <input class="gap-input" id="gap-12" placeholder="word…" oninput="onGapInput(12)"> was consolidated when <em>Bliss and Other Stories</em> was published</span>
-        </div>
+          <div class="note-item gap-item" id="qblock-10">
+            <span class="bullet">•</span>
+            <span class="gap-text"><span class="q-num-inline">10.</span> <input class="gap-input" id="gap-10" oninput="onGapInput(10)"> prevented Mansfield and Murry from staying together in Paris</span>
+          </div>
 
-        <div style="padding-left:16px; margin: 8px 0 8px; font-size:13px; color:var(--text-muted)">— wrote several stories at "Villa Isola Bella"</div>
-        <div style="padding-left:16px; margin-bottom:8px; font-size:13px; color:var(--text-muted); font-weight:500">1923–1924:</div>
+          <div class="note-item gap-item" id="qblock-11">
+            <span class="bullet">•</span>
+            <span class="gap-text">spent time with distinguished <span class="q-num-inline">11.</span> <input class="gap-input" id="gap-11" oninput="onGapInput(11)"></span>
+          </div>
 
-        <div class="gap-item" id="qblock-13">
-          <span class="q-num">13</span>
-          <span class="gap-text">— Mansfield's <input class="gap-input" id="gap-13" placeholder="word…" oninput="onGapInput(13)"> published more of her works after her death</span>
-        </div>
+          <div class="note-item context-note">
+            <span class="bullet">•</span>
+            <span>from 1916, tuberculosis restricted the time she spent in London</span>
+          </div>
 
+          <div class="note-item context-note">
+            <span class="bullet">•</span>
+            <span>1920:</span>
+          </div>
+
+          <div class="note-item gap-item" id="qblock-12">
+            <span class="bullet">•</span>
+            <span class="gap-text">her <span class="q-num-inline">12.</span> <input class="gap-input" id="gap-12" oninput="onGapInput(12)"> was consolidated when <em>Bliss and Other Stories</em> was published</span>
+          </div>
+
+          <div class="note-item context-note">
+            <span class="bullet">•</span>
+            <span>wrote several stories at "Villa Isola Bella"</span>
+          </div>
+
+          <div class="note-item context-note">
+            <span class="bullet">•</span>
+            <span>1923–1924:</span>
+          </div>
+
+          <div class="note-item gap-item" id="qblock-13">
+            <span class="bullet">•</span>
+            <span class="gap-text">Mansfield's <span class="q-num-inline">13.</span> <input class="gap-input" id="gap-13" oninput="onGapInput(13)"> published more of her works after her death</span>
+          </div>
+
+        </div><!-- end notes-list -->
       </div><!-- end section 2 -->
     </div><!-- end questions-body -->
 
@@ -807,8 +903,8 @@
 
 <!-- BOTTOM NAV -->
 <div id="bottom-nav">
-  <span class="nav-label">Q</span>
-  <div id="q-dots"></div>
+  <span class="nav-label">Questions</span>
+  <div id="q-dots" style="display:flex;gap:5px;align-items:center;flex-wrap:nowrap"></div>
 </div>
 
 <!-- RESULTS OVERLAY -->
@@ -981,8 +1077,14 @@ function buildDots() {
     d.className = 'q-dot';
     d.id = 'dot-' + i;
     d.textContent = i;
+    d.title = 'Question ' + i;
     d.onclick = () => scrollToQ(i);
     wrap.appendChild(d);
+    if (i === 6) {
+      const sep = document.createElement('div');
+      sep.className = 'nav-sep';
+      wrap.appendChild(sep);
+    }
   }
 }
 
