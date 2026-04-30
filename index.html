@@ -1,0 +1,1138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>IELTS Reading Practice | Katherine Mansfield</title>
+<link href="https://fonts.googleapis.com/css2?family=Merriweather:ital,wght@0,300;0,400;0,700;1,300&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #f5f3ee;
+    --surface: #ffffff;
+    --surface2: #f0ede6;
+    --border: #ddd8ce;
+    --text: #1a1814;
+    --text-muted: #7a7268;
+    --accent: #2d5a8e;
+    --accent-light: #e8f0f9;
+    --green: #2a7a4b;
+    --green-light: #e6f4ec;
+    --red: #b5361f;
+    --red-light: #fdecea;
+    --orange: #c46b00;
+    --orange-light: #fef3e2;
+    --answered: #2d5a8e;
+    --unanswered: #ccc8bf;
+    --highlight: #fffbea;
+    --timer-warn: #c46b00;
+    --timer-danger: #b5361f;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    height: 100vh;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* ── TOP BAR ── */
+  #topbar {
+    background: var(--surface);
+    border-bottom: 1.5px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 24px;
+    height: 58px;
+    flex-shrink: 0;
+    box-shadow: 0 1px 4px rgba(0,0,0,.05);
+    z-index: 100;
+  }
+  .brand {
+    font-family: 'Merriweather', serif;
+    font-weight: 700;
+    font-size: 15px;
+    color: var(--accent);
+    letter-spacing: -.2px;
+  }
+  .brand span { color: var(--text-muted); font-weight: 300; }
+
+  #timer-wrap {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  #timer {
+    font-family: 'DM Mono', monospace;
+    font-size: 22px;
+    font-weight: 500;
+    color: var(--text);
+    letter-spacing: 1px;
+    min-width: 56px;
+    text-align: center;
+    transition: color .3s;
+  }
+  #timer.warn { color: var(--timer-warn); }
+  #timer.danger { color: var(--timer-danger); animation: pulse .8s infinite; }
+  @keyframes pulse { 50% { opacity: .5; } }
+
+  .icon-btn {
+    background: var(--surface2);
+    border: 1.5px solid var(--border);
+    border-radius: 8px;
+    width: 36px; height: 36px;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 16px;
+    transition: background .15s, transform .1s;
+    color: var(--text-muted);
+  }
+  .icon-btn:hover { background: var(--border); color: var(--text); }
+  .icon-btn:active { transform: scale(.95); }
+
+  #test-label {
+    font-size: 12px;
+    color: var(--text-muted);
+    font-weight: 500;
+    letter-spacing: .5px;
+    text-transform: uppercase;
+  }
+
+  /* ── START OVERLAY ── */
+  #start-overlay {
+    position: fixed; inset: 0;
+    background: rgba(245,243,238,.97);
+    display: flex; align-items: center; justify-content: center;
+    z-index: 999;
+    flex-direction: column;
+    gap: 24px;
+    padding: 32px;
+  }
+  .start-card {
+    background: var(--surface);
+    border: 1.5px solid var(--border);
+    border-radius: 16px;
+    padding: 48px 52px;
+    max-width: 520px;
+    width: 100%;
+    text-align: center;
+    box-shadow: 0 8px 40px rgba(0,0,0,.08);
+  }
+  .start-card h1 {
+    font-family: 'Merriweather', serif;
+    font-size: 24px;
+    font-weight: 700;
+    margin-bottom: 8px;
+  }
+  .start-card p { color: var(--text-muted); font-size: 14.5px; line-height: 1.6; margin-bottom: 6px; }
+  .meta-row {
+    display: flex; gap: 16px; justify-content: center; margin: 24px 0;
+  }
+  .meta-chip {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 8px 16px;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text-muted);
+  }
+  .meta-chip strong { color: var(--text); display: block; font-size: 18px; }
+  .start-btn {
+    background: var(--accent);
+    color: #fff;
+    border: none;
+    border-radius: 10px;
+    padding: 14px 36px;
+    font-size: 15px;
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 600;
+    cursor: pointer;
+    letter-spacing: .2px;
+    transition: background .15s, transform .1s;
+  }
+  .start-btn:hover { background: #1e4270; }
+  .start-btn:active { transform: scale(.97); }
+
+  /* ── MAIN LAYOUT ── */
+  #main {
+    display: flex;
+    flex: 1;
+    overflow: hidden;
+  }
+
+  /* ── PASSAGE PANEL ── */
+  #passage-panel {
+    width: 50%;
+    border-right: 2px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    background: var(--surface);
+  }
+  .panel-header {
+    background: var(--surface2);
+    border-bottom: 1.5px solid var(--border);
+    padding: 12px 24px;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    display: flex; align-items: center; gap: 8px;
+    flex-shrink: 0;
+  }
+  .panel-dot { width:6px; height:6px; border-radius:50%; background: var(--accent); display:inline-block; }
+  #passage-body {
+    overflow-y: auto;
+    padding: 32px 36px;
+    flex: 1;
+    scroll-behavior: smooth;
+  }
+  #passage-body::-webkit-scrollbar { width: 6px; }
+  #passage-body::-webkit-scrollbar-track { background: var(--surface2); }
+  #passage-body::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+
+  #passage-body h2 {
+    font-family: 'Merriweather', serif;
+    font-size: 22px;
+    font-weight: 700;
+    margin-bottom: 6px;
+    line-height: 1.3;
+  }
+  #passage-body .subtitle {
+    font-family: 'Merriweather', serif;
+    font-style: italic;
+    font-size: 13.5px;
+    color: var(--text-muted);
+    margin-bottom: 28px;
+    line-height: 1.5;
+  }
+  #passage-body p {
+    font-family: 'Merriweather', serif;
+    font-size: 13.8px;
+    line-height: 1.85;
+    color: #2a2620;
+    margin-bottom: 18px;
+  }
+  #passage-body em { font-style: italic; }
+
+  /* ── QUESTIONS PANEL ── */
+  #questions-panel {
+    width: 50%;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    background: var(--bg);
+  }
+  #questions-body {
+    overflow-y: auto;
+    padding: 28px 32px;
+    flex: 1;
+  }
+  #questions-body::-webkit-scrollbar { width: 6px; }
+  #questions-body::-webkit-scrollbar-track { background: var(--surface2); }
+  #questions-body::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+
+  .section-title {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 1.2px;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 4px;
+  }
+  .section-heading {
+    font-family: 'Merriweather', serif;
+    font-size: 16px;
+    font-weight: 700;
+    margin-bottom: 6px;
+  }
+  .section-instructions {
+    background: var(--surface);
+    border: 1.5px solid var(--border);
+    border-radius: 10px;
+    padding: 14px 18px;
+    font-size: 13px;
+    color: var(--text-muted);
+    margin-bottom: 20px;
+    line-height: 1.6;
+  }
+  .section-instructions em { font-style: italic; }
+  .badge {
+    display: inline-block;
+    background: var(--accent-light);
+    color: var(--accent);
+    font-size: 11px;
+    font-weight: 700;
+    border-radius: 4px;
+    padding: 2px 7px;
+    margin-bottom: 6px;
+    letter-spacing: .4px;
+    text-transform: uppercase;
+  }
+
+  /* TF questions */
+  .tf-question {
+    background: var(--surface);
+    border: 1.5px solid var(--border);
+    border-radius: 10px;
+    padding: 16px 18px;
+    margin-bottom: 12px;
+    transition: border-color .15s, background .15s;
+  }
+  .tf-question.answered { border-color: var(--accent); background: var(--accent-light); }
+  .tf-q-row {
+    display: flex; gap: 12px; align-items: flex-start; margin-bottom: 10px;
+  }
+  .q-num {
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--accent);
+    min-width: 22px;
+    padding-top: 1px;
+  }
+  .q-text { font-size: 13.5px; line-height: 1.55; }
+  .tf-options {
+    display: flex; gap: 8px; padding-left: 34px;
+  }
+  .tf-opt {
+    border: 1.5px solid var(--border);
+    border-radius: 6px;
+    padding: 5px 14px;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    background: var(--surface2);
+    color: var(--text-muted);
+    transition: all .12s;
+  }
+  .tf-opt:hover { border-color: var(--accent); color: var(--accent); background: var(--accent-light); }
+  .tf-opt.selected { background: var(--accent); color: #fff; border-color: var(--accent); }
+
+  /* Gap fill questions */
+  .gap-section { margin-bottom: 28px; }
+  .gap-section-title {
+    font-family: 'Merriweather', serif;
+    font-size: 14px;
+    font-weight: 700;
+    text-align: center;
+    margin-bottom: 18px;
+    padding: 10px;
+    background: var(--surface2);
+    border-radius: 8px;
+    border: 1px solid var(--border);
+  }
+  .gap-item {
+    background: var(--surface);
+    border: 1.5px solid var(--border);
+    border-radius: 10px;
+    padding: 14px 18px;
+    margin-bottom: 10px;
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    transition: border-color .15s;
+  }
+  .gap-item.answered { border-color: var(--accent); }
+  .gap-text { font-size: 13.5px; line-height: 1.6; flex: 1; }
+  .gap-input {
+    display: inline-block;
+    border: none;
+    border-bottom: 2px solid var(--accent);
+    background: transparent;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13.5px;
+    font-weight: 600;
+    color: var(--accent);
+    min-width: 100px;
+    max-width: 160px;
+    padding: 2px 4px;
+    outline: none;
+    text-align: center;
+  }
+  .gap-input:focus { border-bottom-color: var(--text); color: var(--text); }
+  .gap-input::placeholder { color: #bbb; font-weight: 400; font-style: italic; font-size: 12px; }
+
+  /* Submit */
+  #submit-area {
+    padding: 14px 32px;
+    border-top: 1.5px solid var(--border);
+    background: var(--surface);
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+  }
+  #answered-count {
+    font-size: 13px;
+    color: var(--text-muted);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: nowrap;
+    white-space: nowrap;
+  }
+  #answered-count strong { color: var(--text); }
+  .submit-btn {
+    background: var(--accent);
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    padding: 11px 28px;
+    font-size: 14px;
+    font-weight: 600;
+    font-family: 'DM Sans', sans-serif;
+    cursor: pointer;
+    transition: background .15s, transform .1s;
+  }
+  .submit-btn:hover { background: #1e4270; }
+  .submit-btn:active { transform: scale(.97); }
+  .submit-btn:disabled { background: var(--unanswered); cursor: not-allowed; }
+
+  /* ── BOTTOM NAV ── */
+  #bottom-nav {
+    background: var(--surface);
+    border-top: 2px solid var(--border);
+    padding: 10px 24px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-shrink: 0;
+    flex-wrap: wrap;
+  }
+  .nav-label {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: .7px;
+    margin-right: 4px;
+  }
+  .q-dot {
+    width: 30px; height: 30px;
+    border-radius: 6px;
+    border: 1.5px solid var(--unanswered);
+    background: var(--surface2);
+    color: var(--text-muted);
+    font-size: 12px;
+    font-weight: 600;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer;
+    transition: all .12s;
+  }
+  .q-dot:hover { border-color: var(--accent); color: var(--accent); background: var(--accent-light); }
+  .q-dot.done { background: var(--accent); border-color: var(--accent); color: #fff; }
+  .q-dot.current { border-color: var(--accent); color: var(--accent); background: var(--accent-light); box-shadow: 0 0 0 2px var(--accent-light); }
+
+  /* ── RESULTS ── */
+  #results-overlay {
+    position: fixed; inset: 0;
+    background: var(--bg);
+    z-index: 998;
+    display: none;
+    flex-direction: column;
+    overflow: hidden;
+  }
+  #results-overlay.show { display: flex; }
+
+  #results-topbar {
+    background: var(--surface);
+    border-bottom: 1.5px solid var(--border);
+    padding: 0 32px;
+    height: 58px;
+    display: flex; align-items: center; justify-content: space-between;
+    flex-shrink: 0;
+  }
+  #results-topbar .brand { font-size: 15px; }
+
+  #results-body {
+    overflow-y: auto;
+    padding: 36px 40px;
+    max-width: 900px;
+    width: 100%;
+    margin: 0 auto;
+  }
+
+  .score-hero {
+    background: var(--surface);
+    border: 1.5px solid var(--border);
+    border-radius: 16px;
+    padding: 36px;
+    margin-bottom: 32px;
+    text-align: center;
+    box-shadow: 0 4px 20px rgba(0,0,0,.05);
+  }
+  .score-title {
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1.2px;
+    color: var(--text-muted);
+    margin-bottom: 12px;
+  }
+  .score-number {
+    font-family: 'Merriweather', serif;
+    font-size: 64px;
+    font-weight: 700;
+    color: var(--accent);
+    line-height: 1;
+    margin-bottom: 4px;
+  }
+  .score-sub { font-size: 14px; color: var(--text-muted); margin-bottom: 24px; }
+  .score-band {
+    display: inline-block;
+    background: var(--accent);
+    color: #fff;
+    border-radius: 8px;
+    padding: 8px 20px;
+    font-size: 15px;
+    font-weight: 600;
+    letter-spacing: .3px;
+  }
+  .score-stats {
+    display: flex; gap: 16px; justify-content: center; margin-top: 24px;
+  }
+  .stat-chip {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 10px 20px;
+    font-size: 13px;
+    color: var(--text-muted);
+  }
+  .stat-chip strong { color: var(--text); display: block; font-size: 20px; font-weight: 700; }
+  .stat-chip.correct strong { color: var(--green); }
+  .stat-chip.wrong strong { color: var(--red); }
+
+  /* Answer review */
+  .answers-header {
+    font-family: 'Merriweather', serif;
+    font-size: 18px;
+    font-weight: 700;
+    margin-bottom: 20px;
+    display: flex; align-items: center; gap: 10px;
+  }
+  .review-item {
+    background: var(--surface);
+    border: 1.5px solid var(--border);
+    border-radius: 12px;
+    padding: 20px 24px;
+    margin-bottom: 12px;
+  }
+  .review-item.correct-ans { border-color: var(--green); background: var(--green-light); }
+  .review-item.wrong-ans { border-color: var(--red); background: var(--red-light); }
+  .review-top {
+    display: flex; align-items: flex-start; gap: 12px; margin-bottom: 10px;
+  }
+  .review-num {
+    font-size: 12px;
+    font-weight: 700;
+    color: #fff;
+    background: var(--text-muted);
+    border-radius: 5px;
+    padding: 2px 8px;
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+  .review-item.correct-ans .review-num { background: var(--green); }
+  .review-item.wrong-ans .review-num { background: var(--red); }
+  .review-q { font-size: 13.5px; line-height: 1.55; font-weight: 500; }
+  .review-answers {
+    display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 10px; padding-left: 44px;
+  }
+  .ans-chip {
+    font-size: 12px; font-weight: 600;
+    padding: 4px 12px; border-radius: 5px;
+  }
+  .ans-chip.your { background: var(--red-light); color: var(--red); border: 1px solid var(--red); }
+  .ans-chip.your.ok { background: var(--green-light); color: var(--green); border: 1px solid var(--green); }
+  .ans-chip.correct { background: var(--green-light); color: var(--green); border: 1px solid var(--green); }
+  .review-explanation {
+    font-size: 13px;
+    color: var(--text-muted);
+    line-height: 1.65;
+    padding: 12px 16px;
+    background: rgba(255,255,255,.6);
+    border-radius: 8px;
+    margin-left: 44px;
+    border-left: 3px solid var(--border);
+  }
+  .review-item.correct-ans .review-explanation { border-left-color: var(--green); }
+  .review-item.wrong-ans .review-explanation { border-left-color: var(--red); }
+  .review-explanation strong { color: var(--text); }
+
+  .retry-btn {
+    background: var(--surface2);
+    border: 1.5px solid var(--border);
+    border-radius: 8px;
+    padding: 10px 22px;
+    font-size: 14px;
+    font-weight: 500;
+    font-family: 'DM Sans', sans-serif;
+    cursor: pointer;
+    color: var(--text-muted);
+    transition: all .12s;
+  }
+  .retry-btn:hover { background: var(--border); color: var(--text); }
+
+  .copyright {
+    text-align: center;
+    font-size: 11px;
+    color: var(--text-muted);
+    padding: 20px;
+    border-top: 1px solid var(--border);
+    margin-top: 12px;
+  }
+  .copyright span { font-weight: 600; color: var(--accent); }
+</style>
+</head>
+<body>
+
+<!-- START OVERLAY -->
+<div id="start-overlay">
+  <div class="start-card">
+    <div class="section-title" style="margin-bottom:12px">IELTS Reading Practice</div>
+    <h1>Katherine Mansfield</h1>
+    <p style="margin-top:10px">Read the passage carefully, then answer <strong>13 questions</strong>. Choose TRUE, FALSE or NOT GIVEN for questions 1–6, and complete the notes for questions 7–13.</p>
+    <div class="meta-row">
+      <div class="meta-chip"><strong>13</strong>Questions</div>
+      <div class="meta-chip"><strong>60</strong>Minutes</div>
+      <div class="meta-chip"><strong>2</strong>Sections</div>
+    </div>
+    <button class="start-btn" onclick="startTest()">▶ Start Test</button>
+    <p style="margin-top:16px; font-size:12px; color:var(--text-muted)">© aliya.rakhmetzhan — IELTS Practice Material</p>
+  </div>
+</div>
+
+<!-- TOP BAR -->
+<div id="topbar">
+  <div class="brand">IELTS<span> Reading Practice</span></div>
+  <div id="timer-wrap">
+    <div id="test-label">Time Remaining</div>
+    <div id="timer">20:00</div>
+    <button class="icon-btn" id="pause-btn" onclick="togglePause()" title="Pause">⏸</button>
+  </div>
+</div>
+
+<!-- MAIN -->
+<div id="main">
+  <!-- PASSAGE -->
+  <div id="passage-panel">
+    <div class="panel-header"><span class="panel-dot"></span>Reading Passage 1</div>
+    <div id="passage-body">
+      <h2>Katherine Mansfield</h2>
+      <div class="subtitle">Katherine Mansfield was a modernist writer of short fiction who was born and brought up in New Zealand</div>
+
+      <p>Katherine Mansfield Beauchamp Murry was born in 1888, into a prominent family in Wellington, New Zealand. She became one of New Zealand's best-known writers, using the pen name of Katherine Mansfield. The daughter of a banker, and born into a middle-class family, she was also a first cousin of Countess Elizabeth von Arnim, a distinguished novelist in her time. Mansfield had two older sisters and a younger brother. Her father, Harold Beauchamp, went on to become the chairman of the Bank of New Zealand. In 1893, the Mansfield family moved to Karori, a suburb of Wellington, where Mansfield would spend the happiest years of her childhood; she later used her memories of this time as an inspiration for her <em>Prelude</em> story.</p>
+
+      <p>Her first published stories appeared in the <em>High School Reporter</em> and the Wellington Girls' High School magazine in 1898 and 1899. In 1902, she developed strong feelings for a musician who played the cello, Arnold Trowell, although her feelings were not, for the most part, returned. Mansfield herself was an accomplished cellist, having received lessons from Trowell's father. Mansfied wrote in her journals of feeling isolated to some extent in New Zealand, and, in general terms of her interest in the Maori people (New Zealand's native people), who were often portrayed in a sympathetic light in her later stories, such as <em>How Pearl Button was Kidnapped</em>.</p>
+
+      <p>She moved to London in 1903, where she attended Queen's College, along with her two sisters. Mansfield recommenced playing the cello, an occupation that she believed, during her time at Queen's, she would take up professionally. She also began contributing to the college newspaper, with such a dedication to it that she eventually became its editor. She was particularly interested in the works of the French writers of this period and on the 19th-century British writer, Oscar Wilde, and she was appreciated amongst fellow students at Queen's for her lively and charismatic approach to life and work. She met fellow writer Ida Baker, a South African, at the college, and the pair became lifelong friends. Mansfield did not actively support the suffragette movement in the UK. Women in New Zealand had gained the right to vote in 1893.</p>
+
+      <p>Mansfield first began journeying into the other parts of Europe in the period 1903–1906, mainly to Belgium and Germany. After finishing her schooling in England, she returned to her New Zealand home in 1906, only then beginning to write short stories in a serious way. She had several works published in Australia in a magazine called <em>Native Comparison</em>, which was her first paid writing work, and by this time she had her mind set on becoming a professional writer. It was also the first occasion on which she used the pseudonym "k.Mansfied".</p>
+
+      <p>Mansfield rapidly grew discontented with the provincial New Zealand lifestyle, and with her family. Two years later she headed again in London. Her father sent her an annual subsidy of €100 for the rest of her life. In later years, she would express both admiration and disdain for New Zealand in her journals.</p>
+
+      <p>In 1911, Mansfield met John Middleton Murry, the Oxford scholar and editor of the literary magazine <em>Rhythm</em>. They were later to marry in 1918. Mansfield became a co-editor of <em>Rhythm</em>, which was subsequently called The <em>Blue Review</em>, in which more of her works were published. She and Murry lived in various houses in England and briefly in Paris. <em>The Blue Review</em> failed to gain enough readers and was no longer published. Their attempt to set up as writers in Paris was cut short by Murry's bankruptcy, which resulted from the failure of this and other journals. Life back in England meant frequently changed addresses and very limited funds.</p>
+
+      <p>Between 1915 and 1918, Mansfield moved between England and Bandoi, France. She and Murry developed close contact with other well-known writers of the time such as DH Lawrence, Bertrand Russell and Aldous Huxley. By October 1918 Mansfield had become seriously ill; she had been diagnosed with tuberculosis and was advised to enter a sanatorium. She could no longer spend time with writers in London. In the autumn of 1918 she was so ill that she decided to go to Ospedale in Italy. It was the publication of <em>Bliss and Other Stories</em> in 1920 that was to solidify Mansfield's reputation as a writer.</p>
+
+      <p>Mansfied also spent time in Menton, France, as the tenant of her father's cousin at "The Villa Isola Bella". There she wrote she pronounced to be "...the only story that satisfies me to any extent".</p>
+
+      <p>Mansfield produced a great deal of work in the final years of her life, and much of her prose and poetry remained unpublished at her death in 1923. After her death, her husband, Murry, took on the task of editing and publishing her works. His efforts resulted in two additional volumes of short stories. <em>The Doves' Nest and Something Childish</em>, published in 1923 and 1924 respectively, the publication of her Poems as well as a collection of critical writings (Novels and Novelist) and a number of editions of Mansfield's previously unpublished letters and journals.</p>
+    </div>
+  </div>
+
+  <!-- QUESTIONS -->
+  <div id="questions-panel">
+    <div class="panel-header"><span class="panel-dot"></span>Questions</div>
+    <div id="questions-body">
+
+      <!-- SECTION 1: TF/NG -->
+      <div class="section-title">Questions 1–6</div>
+      <div class="section-heading" style="margin-bottom:10px">True / False / Not Given</div>
+      <div class="section-instructions">
+        Do the following statements agree with the information in the passage?<br>
+        Write <strong>TRUE</strong> if the statement agrees · <strong>FALSE</strong> if it contradicts · <strong>NOT GIVEN</strong> if there is no information
+      </div>
+
+      <!-- Q1 -->
+      <div class="tf-question" id="qblock-1">
+        <div class="tf-q-row">
+          <span class="q-num">1</span>
+          <span class="q-text">The name Katherine Mansfield, that appears on the writer's book, was exactly the same as her origin name.</span>
+        </div>
+        <div class="tf-options">
+          <button class="tf-opt" onclick="selectTF(1,'TRUE')">TRUE</button>
+          <button class="tf-opt" onclick="selectTF(1,'FALSE')">FALSE</button>
+          <button class="tf-opt" onclick="selectTF(1,'NOT GIVEN')">NOT GIVEN</button>
+        </div>
+      </div>
+
+      <!-- Q2 -->
+      <div class="tf-question" id="qblock-2">
+        <div class="tf-q-row">
+          <span class="q-num">2</span>
+          <span class="q-text">Mansfield won a prize for a story she wrote for the <em>High School Reporter</em>.</span>
+        </div>
+        <div class="tf-options">
+          <button class="tf-opt" onclick="selectTF(2,'TRUE')">TRUE</button>
+          <button class="tf-opt" onclick="selectTF(2,'FALSE')">FALSE</button>
+          <button class="tf-opt" onclick="selectTF(2,'NOT GIVEN')">NOT GIVEN</button>
+        </div>
+      </div>
+
+      <!-- Q3 -->
+      <div class="tf-question" id="qblock-3">
+        <div class="tf-q-row">
+          <span class="q-num">3</span>
+          <span class="q-text"><em>How Pearl Button Was Kidnapped</em> portrayed Maori people in a favorable way.</span>
+        </div>
+        <div class="tf-options">
+          <button class="tf-opt" onclick="selectTF(3,'TRUE')">TRUE</button>
+          <button class="tf-opt" onclick="selectTF(3,'FALSE')">FALSE</button>
+          <button class="tf-opt" onclick="selectTF(3,'NOT GIVEN')">NOT GIVEN</button>
+        </div>
+      </div>
+
+      <!-- Q4 -->
+      <div class="tf-question" id="qblock-4">
+        <div class="tf-q-row">
+          <span class="q-num">4</span>
+          <span class="q-text">When Mansfield was at Queen's College, she planned to be a professional writer.</span>
+        </div>
+        <div class="tf-options">
+          <button class="tf-opt" onclick="selectTF(4,'TRUE')">TRUE</button>
+          <button class="tf-opt" onclick="selectTF(4,'FALSE')">FALSE</button>
+          <button class="tf-opt" onclick="selectTF(4,'NOT GIVEN')">NOT GIVEN</button>
+        </div>
+      </div>
+
+      <!-- Q5 -->
+      <div class="tf-question" id="qblock-5">
+        <div class="tf-q-row">
+          <span class="q-num">5</span>
+          <span class="q-text">Mansfield was unpopular with the other students at Queen's College.</span>
+        </div>
+        <div class="tf-options">
+          <button class="tf-opt" onclick="selectTF(5,'TRUE')">TRUE</button>
+          <button class="tf-opt" onclick="selectTF(5,'FALSE')">FALSE</button>
+          <button class="tf-opt" onclick="selectTF(5,'NOT GIVEN')">NOT GIVEN</button>
+        </div>
+      </div>
+
+      <!-- Q6 -->
+      <div class="tf-question" id="qblock-6">
+        <div class="tf-q-row">
+          <span class="q-num">6</span>
+          <span class="q-text">In London, Mansfield showed little interest in politics.</span>
+        </div>
+        <div class="tf-options">
+          <button class="tf-opt" onclick="selectTF(6,'TRUE')">TRUE</button>
+          <button class="tf-opt" onclick="selectTF(6,'FALSE')">FALSE</button>
+          <button class="tf-opt" onclick="selectTF(6,'NOT GIVEN')">NOT GIVEN</button>
+        </div>
+      </div>
+
+      <!-- SECTION 2: Gap fill -->
+      <div style="margin-top:32px">
+        <div class="section-title">Questions 7–13</div>
+        <div class="section-heading" style="margin-bottom:10px">Note Completion</div>
+        <div class="section-instructions">
+          Complete the notes below. Choose <strong>ONE WORD AND/OR A NUMBER</strong> from the passage for each answer.
+        </div>
+
+        <div class="gap-section-title">Katherine Mansfield's adult years</div>
+
+        <div class="gap-item" id="qblock-7">
+          <span class="q-num">7</span>
+          <span class="gap-text">— <input class="gap-input" id="gap-7" placeholder="year…" oninput="onGapInput(7)"> — moved from England back to New Zealand</span>
+        </div>
+
+        <div class="gap-item" id="qblock-8">
+          <span class="q-num">8</span>
+          <span class="gap-text">— first paid writing work was in a publication based in <input class="gap-input" id="gap-8" placeholder="country…" oninput="onGapInput(8)"></span>
+        </div>
+
+        <div class="gap-item" id="qblock-9">
+          <span class="q-num">9</span>
+          <span class="gap-text">— her <input class="gap-input" id="gap-9" placeholder="word…" oninput="onGapInput(9)"> and the New Zealand way of life made her feel dissatisfied</span>
+        </div>
+
+        <div style="padding-left:16px; margin: 8px 0 8px; font-size:13px; color:var(--text-muted); font-weight:500">1908: returned to London &nbsp; · &nbsp; 1911–1919:</div>
+        <div style="padding-left:16px; margin-bottom: 8px; font-size:13px; color:var(--text-muted)">— Met John Middleton Murry in 1911</div>
+
+        <div class="gap-item" id="qblock-10">
+          <span class="q-num">10</span>
+          <span class="gap-text">— <input class="gap-input" id="gap-10" placeholder="word…" oninput="onGapInput(10)"> prevented Mansfield and Murry from staying together in Paris</span>
+        </div>
+
+        <div class="gap-item" id="qblock-11">
+          <span class="q-num">11</span>
+          <span class="gap-text">— spent time with distinguished <input class="gap-input" id="gap-11" placeholder="word…" oninput="onGapInput(11)"></span>
+        </div>
+
+        <div style="padding-left:16px; margin: 8px 0 8px; font-size:13px; color:var(--text-muted)">— from 1916, tuberculosis restricted the time she spent in London</div>
+        <div style="padding-left:16px; margin-bottom:8px; font-size:13px; color:var(--text-muted); font-weight:500">1920:</div>
+
+        <div class="gap-item" id="qblock-12">
+          <span class="q-num">12</span>
+          <span class="gap-text">— her <input class="gap-input" id="gap-12" placeholder="word…" oninput="onGapInput(12)"> was consolidated when <em>Bliss and Other Stories</em> was published</span>
+        </div>
+
+        <div style="padding-left:16px; margin: 8px 0 8px; font-size:13px; color:var(--text-muted)">— wrote several stories at "Villa Isola Bella"</div>
+        <div style="padding-left:16px; margin-bottom:8px; font-size:13px; color:var(--text-muted); font-weight:500">1923–1924:</div>
+
+        <div class="gap-item" id="qblock-13">
+          <span class="q-num">13</span>
+          <span class="gap-text">— Mansfield's <input class="gap-input" id="gap-13" placeholder="word…" oninput="onGapInput(13)"> published more of her works after her death</span>
+        </div>
+
+      </div><!-- end section 2 -->
+    </div><!-- end questions-body -->
+
+    <div id="submit-area">
+      <div id="answered-count">Answered: <strong id="ans-num">0</strong> / 13</div>
+      <button class="submit-btn" onclick="submitTest()">Submit Test →</button>
+    </div>
+  </div><!-- end questions-panel -->
+</div><!-- end main -->
+
+<!-- BOTTOM NAV -->
+<div id="bottom-nav">
+  <span class="nav-label">Q</span>
+  <div id="q-dots"></div>
+</div>
+
+<!-- RESULTS OVERLAY -->
+<div id="results-overlay">
+  <div id="results-topbar">
+    <div class="brand">IELTS<span> Reading Practice</span> · <span style="color:var(--accent)">Results</span></div>
+    <div style="display:flex;gap:10px;align-items:center">
+      <button class="retry-btn" onclick="reviewTest()">👁 Review Answers</button>
+      <button class="retry-btn" onclick="retryTest()">↺ Try Again</button>
+    </div>
+  </div>
+  <div id="results-body">
+    <div class="score-hero">
+      <div class="score-title">Your Score</div>
+      <div class="score-number" id="score-number">0</div>
+      <div class="score-sub" id="score-sub">out of 13 correct</div>
+      <div class="score-band" id="score-band">Band –</div>
+      <div class="score-stats">
+        <div class="stat-chip correct"><strong id="stat-correct">0</strong>Correct</div>
+        <div class="stat-chip wrong"><strong id="stat-wrong">0</strong>Incorrect</div>
+        <div class="stat-chip"><strong id="stat-skip">0</strong>Skipped</div>
+        <div class="stat-chip"><strong id="stat-time">—</strong>Time Spent</div>
+      </div>
+    </div>
+
+    <div class="answers-header">📋 Detailed Review</div>
+    <div id="review-list"></div>
+
+    <div class="copyright">© <span>aliya.rakhmetzhan</span> — IELTS Reading Practice Material. For personal study use only.</div>
+  </div>
+</div>
+
+<script>
+// ─── DATA ───────────────────────────────────────────────────────────────────
+const CORRECT = {
+  1: 'FALSE',
+  2: 'NOT GIVEN',
+  3: 'TRUE',
+  4: 'FALSE',
+  5: 'FALSE',
+  6: 'TRUE',
+  7: '1906',
+  8: 'australia',
+  9: 'family',
+  10: 'bankruptcy',
+  11: 'writers',
+  12: 'reputation',
+  13: 'husband'
+};
+
+const EXPLANATIONS = {
+  1: 'The passage states her real name was <strong>Katherine Mansfield Beauchamp Murry</strong>, and she used the <em>pen name</em> "Katherine Mansfield." The two names are not the same — her pen name omits her birth surname Beauchamp and married name Murry.',
+  2: 'The passage only says her stories <em>appeared</em> in the High School Reporter. There is <strong>no mention of any prize</strong>, so we cannot say this is true or false.',
+  3: 'The passage says Maori people "were often portrayed in a <strong>sympathetic light</strong>" in her stories — sympathetic means favorable, so this is TRUE.',
+  4: 'At Queen\'s College, Mansfield believed she would take up the <strong>cello professionally</strong>, not writing. She only became serious about writing after returning to New Zealand in 1906.',
+  5: 'The passage says she was "<strong>appreciated amongst fellow students</strong> at Queen\'s for her lively and charismatic approach" — this is the opposite of unpopular.',
+  6: 'The passage states Mansfield "did <strong>not actively support</strong> the suffragette movement" — showing she showed little interest in this political cause. TRUE.',
+  7: 'The passage states: "After finishing her schooling in England, she returned to her New Zealand home in <strong>1906</strong>."',
+  8: 'She had works published in "<strong>Australia</strong>" in a magazine called Native Comparison — "which was her first paid writing work."',
+  9: '"Mansfield rapidly grew discontented with the provincial New Zealand lifestyle, and with her <strong>family</strong>."',
+  10: 'Their time in Paris "was cut short by Murry\'s <strong>bankruptcy</strong>, which resulted from the failure of this and other journals."',
+  11: 'She and Murry "developed close contact with other well-known <strong>writers</strong> of the time such as DH Lawrence, Bertrand Russell and Aldous Huxley."',
+  12: '"It was the publication of Bliss and Other Stories in 1920 that was to solidify Mansfield\'s <strong>reputation</strong> as a writer."',
+  13: '"After her death, her <strong>husband</strong>, Murry, took on the task of editing and publishing her works."'
+};
+
+const QUESTION_TEXT = {
+  1: 'The name Katherine Mansfield, that appears on the writer\'s book, was exactly the same as her origin name.',
+  2: 'Mansfield won a prize for a story she wrote for the High School Reporter.',
+  3: 'How Pearl Button Was Kidnapped portrayed Maori people in a favorable way.',
+  4: 'When Mansfield was at Queen\'s College, she planned to be a professional writer.',
+  5: 'Mansfield was unpopular with the other students at Queen\'s College.',
+  6: 'In London, Mansfield showed little interest in politics.',
+  7: '_____ — moved from England back to New Zealand',
+  8: 'first paid writing work was in a publication based in _____',
+  9: 'her _____ and the New Zealand way of life made her feel dissatisfied',
+  10: '_____ prevented Mansfield and Murry from staying together in Paris',
+  11: 'spent time with distinguished _____',
+  12: 'her _____ was consolidated when Bliss and Other Stories was published',
+  13: 'Mansfield\'s _____ published more of her works after her death'
+};
+
+// ─── STATE ───────────────────────────────────────────────────────────────────
+let answers = {};
+let timerInterval = null;
+let secondsLeft = 60 * 60;
+let secondsElapsed = 0;
+let paused = false;
+let started = false;
+
+// ─── TIMER ────────────────────────────────────────────────────────────────────
+function startTest() {
+  document.getElementById('start-overlay').style.display = 'none';
+  started = true;
+  startTimer();
+  buildDots();
+}
+
+function startTimer() {
+  timerInterval = setInterval(() => {
+    if (paused) return;
+    secondsLeft--;
+    secondsElapsed++;
+    updateTimerDisplay();
+    if (secondsLeft <= 0) {
+      clearInterval(timerInterval);
+      submitTest();
+    }
+  }, 1000);
+}
+
+function updateTimerDisplay() {
+  const h = Math.floor(secondsLeft / 3600);
+  const m = Math.floor((secondsLeft % 3600) / 60);
+  const s = secondsLeft % 60;
+  const el = document.getElementById('timer');
+  if (h > 0) {
+    el.textContent = `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+  } else {
+    el.textContent = `${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+  }
+  el.className = '';
+  if (secondsLeft <= 60) el.classList.add('danger');
+  else if (secondsLeft <= 300) el.classList.add('warn');
+}
+
+function togglePause() {
+  paused = !paused;
+  document.getElementById('pause-btn').textContent = paused ? '▶' : '⏸';
+  document.getElementById('pause-btn').title = paused ? 'Resume' : 'Pause';
+}
+
+// ─── ANSWERS ─────────────────────────────────────────────────────────────────
+function selectTF(qNum, val) {
+  answers[qNum] = val;
+  const block = document.getElementById('qblock-' + qNum);
+  block.classList.add('answered');
+  block.querySelectorAll('.tf-opt').forEach(b => {
+    b.classList.remove('selected');
+    if (b.textContent === val) b.classList.add('selected');
+  });
+  updateAnsweredCount();
+  updateDot(qNum);
+}
+
+function onGapInput(qNum) {
+  const val = document.getElementById('gap-' + qNum).value.trim();
+  if (val.length > 0) {
+    answers[qNum] = val;
+    document.getElementById('qblock-' + qNum).classList.add('answered');
+  } else {
+    delete answers[qNum];
+    document.getElementById('qblock-' + qNum).classList.remove('answered');
+  }
+  updateAnsweredCount();
+  updateDot(qNum);
+}
+
+function updateAnsweredCount() {
+  const count = Object.keys(answers).length;
+  document.getElementById('ans-num').textContent = count;
+}
+
+// ─── DOTS ─────────────────────────────────────────────────────────────────────
+function buildDots() {
+  const wrap = document.getElementById('q-dots');
+  wrap.innerHTML = '';
+  for (let i = 1; i <= 13; i++) {
+    const d = document.createElement('div');
+    d.className = 'q-dot';
+    d.id = 'dot-' + i;
+    d.textContent = i;
+    d.onclick = () => scrollToQ(i);
+    wrap.appendChild(d);
+  }
+}
+
+function updateDot(qNum) {
+  const d = document.getElementById('dot-' + qNum);
+  if (!d) return;
+  if (answers[qNum] !== undefined) d.classList.add('done');
+  else d.classList.remove('done');
+}
+
+function scrollToQ(qNum) {
+  document.getElementById('qblock-' + qNum)?.scrollIntoView({behavior:'smooth', block:'center'});
+}
+
+// ─── SUBMIT ───────────────────────────────────────────────────────────────────
+function submitTest() {
+  clearInterval(timerInterval);
+  showResults();
+}
+
+function showResults() {
+  let correct = 0, wrong = 0, skipped = 0;
+  const review = [];
+
+  for (let i = 1; i <= 13; i++) {
+    const userRaw = answers[i];
+    const user = userRaw ? userRaw.toString().toLowerCase().trim() : null;
+    const correctAns = CORRECT[i].toString().toLowerCase().trim();
+    const isCorrect = user === correctAns;
+    if (!user) skipped++;
+    else if (isCorrect) correct++;
+    else wrong++;
+    review.push({ q: i, user: userRaw || null, correct: CORRECT[i], isCorrect });
+  }
+
+  document.getElementById('score-number').textContent = correct;
+  document.getElementById('score-sub').textContent = `out of 13 correct`;
+  document.getElementById('stat-correct').textContent = correct;
+  document.getElementById('stat-wrong').textContent = wrong;
+  document.getElementById('stat-skip').textContent = skipped;
+
+  // Time spent
+  const em = secondsElapsed;
+  const th = Math.floor(em / 3600);
+  const tm = Math.floor((em % 3600) / 60);
+  const ts = em % 60;
+  let timeStr = th > 0
+    ? `${th}h ${String(tm).padStart(2,'0')}m`
+    : `${tm}m ${String(ts).padStart(2,'0')}s`;
+  document.getElementById('stat-time').textContent = timeStr;
+
+  // Band estimate
+  const pct = correct / 13;
+  let band = '4.0';
+  if (pct >= 0.92) band = '8.5–9.0';
+  else if (pct >= 0.85) band = '8.0';
+  else if (pct >= 0.77) band = '7.5';
+  else if (pct >= 0.69) band = '7.0';
+  else if (pct >= 0.62) band = '6.5';
+  else if (pct >= 0.54) band = '6.0';
+  else if (pct >= 0.46) band = '5.5';
+  else if (pct >= 0.38) band = '5.0';
+  else if (pct >= 0.31) band = '4.5';
+  document.getElementById('score-band').textContent = 'Estimated Band: ' + band;
+
+  // Review
+  const list = document.getElementById('review-list');
+  list.innerHTML = '';
+  review.forEach(item => {
+    const div = document.createElement('div');
+    div.className = 'review-item ' + (item.isCorrect ? 'correct-ans' : 'wrong-ans');
+
+    const userDisplay = item.user || '(no answer)';
+    const yourClass = item.isCorrect ? 'ans-chip your ok' : 'ans-chip your';
+
+    div.innerHTML = `
+      <div class="review-top">
+        <span class="review-num">${item.q}</span>
+        <span class="review-q">${QUESTION_TEXT[item.q]}</span>
+      </div>
+      <div class="review-answers">
+        <span class="${yourClass}">Your answer: ${userDisplay}</span>
+        ${!item.isCorrect ? `<span class="ans-chip correct">Correct: ${item.correct}</span>` : ''}
+      </div>
+      <div class="review-explanation">${EXPLANATIONS[item.q]}</div>
+    `;
+    list.appendChild(div);
+  });
+
+  document.getElementById('results-overlay').classList.add('show');
+}
+
+function retryTest() {
+  location.reload();
+}
+
+function reviewTest() {
+  // Hide results, show main test in read-only review mode
+  document.getElementById('results-overlay').classList.remove('show');
+
+  // Mark all answers visually as correct/wrong
+  for (let i = 1; i <= 13; i++) {
+    const block = document.getElementById('qblock-' + i);
+    if (!block) continue;
+    const userRaw = answers[i];
+    const user = userRaw ? userRaw.toString().toLowerCase().trim() : null;
+    const correctAns = CORRECT[i].toString().toLowerCase().trim();
+    const isCorrect = user === correctAns;
+
+    // Remove existing answered class, add result class
+    block.classList.remove('answered');
+    block.style.borderColor = isCorrect ? 'var(--green)' : 'var(--red)';
+    block.style.background = isCorrect ? 'var(--green-light)' : 'var(--red-light)';
+
+    // For gap inputs, show correct value
+    const inp = document.getElementById('gap-' + i);
+    if (inp) {
+      inp.disabled = true;
+      if (!isCorrect) {
+        inp.style.borderBottomColor = 'var(--red)';
+        inp.style.color = 'var(--red)';
+        // Show correct below
+        let hint = inp.parentElement.querySelector('.correct-hint');
+        if (!hint) {
+          hint = document.createElement('span');
+          hint.className = 'correct-hint';
+          hint.style.cssText = 'font-size:11px;color:var(--green);font-weight:700;margin-left:6px;';
+          inp.parentElement.appendChild(hint);
+        }
+        hint.textContent = '✓ ' + CORRECT[i];
+      } else {
+        inp.style.borderBottomColor = 'var(--green)';
+        inp.style.color = 'var(--green)';
+      }
+    }
+
+    // For TF buttons, disable them
+    block.querySelectorAll('.tf-opt').forEach(b => {
+      b.disabled = true;
+      b.style.cursor = 'default';
+    });
+  }
+
+  // Change submit area to show "Back to Results"
+  const submitArea = document.getElementById('submit-area');
+  submitArea.innerHTML = `
+    <div style="font-size:13px;color:var(--text-muted)">📖 Review mode — answers are highlighted</div>
+    <button class="submit-btn" onclick="document.getElementById('results-overlay').classList.add('show')">← Back to Results</button>
+  `;
+}
+</script>
+</body>
+</html>
